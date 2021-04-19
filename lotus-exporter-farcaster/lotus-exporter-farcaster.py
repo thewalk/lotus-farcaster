@@ -386,8 +386,9 @@ def main():
     print("# TYPE lotus_miner_worker_mem_physical gauge")
     print("# HELP lotus_miner_worker_mem_swap server SWAP")
     print("# TYPE lotus_miner_worker_mem_swap gauge")
-    for val in workerstats["result"].items():
-        val = val[1]
+    for item in workerstats["result"].items():
+        worker = item[0]
+        val = item[1]
         info = val["Info"]
         worker_host = info["Hostname"]
         mem_physical = info["Resources"]["MemPhysical"]
@@ -403,15 +404,15 @@ def main():
             gpu_used = 0
         cpu_used = val["CpuUse"]
 
-        print(f'lotus_miner_worker_cpu {{ miner_id="{miner_id}", worker_host="{worker_host}" }} { cpus }')
-        print(f'lotus_miner_worker_gpu {{ miner_id="{miner_id}", worker_host="{worker_host}" }} { gpus }')
-        print(f'lotus_miner_worker_mem_physical {{ miner_id="{miner_id}", worker_host="{worker_host}" }} { mem_physical }')
-        print(f'lotus_miner_worker_mem_swap {{ miner_id="{miner_id}", worker_host="{worker_host}" }} { mem_swap }')
-        print(f'lotus_miner_worker_mem_physical_used {{ miner_id="{miner_id}", worker_host="{worker_host}" }} {mem_used_min}')
-        print(f'lotus_miner_worker_mem_vmem_used {{ miner_id="{miner_id}", worker_host="{worker_host}" }} {mem_used_max}')
-        print(f'lotus_miner_worker_mem_reserved {{ miner_id="{miner_id}", worker_host="{worker_host}" }} {mem_reserved}')
-        print(f'lotus_miner_worker_gpu_used {{ miner_id="{miner_id}", worker_host="{worker_host}" }} {gpu_used}')
-        print(f'lotus_miner_worker_cpu_used {{ miner_id="{miner_id}", worker_host="{worker_host}" }} {cpu_used}')
+        print(f'lotus_miner_worker_cpu {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} { cpus }')
+        print(f'lotus_miner_worker_gpu {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} { gpus }')
+        print(f'lotus_miner_worker_mem_physical {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} { mem_physical }')
+        print(f'lotus_miner_worker_mem_swap {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} { mem_swap }')
+        print(f'lotus_miner_worker_mem_physical_used {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} {mem_used_min}')
+        print(f'lotus_miner_worker_mem_vmem_used {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} {mem_used_max}')
+        print(f'lotus_miner_worker_mem_reserved {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} {mem_reserved}')
+        print(f'lotus_miner_worker_gpu_used {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} {gpu_used}')
+        print(f'lotus_miner_worker_cpu_used {{ miner_id="{miner_id}", worker = "{worker}", worker_host="{worker_host}" }} {cpu_used}')
     checkpoint("Workers")
 
     # GENERATE JOB INFOS
@@ -431,8 +432,8 @@ def main():
             task = str(job['Task'])
             job_start_time = str(job['Start'])
             run_wait = str(job['RunWait'])
-            job_start_epoch = time.mktime(time.strptime(job_start_time[:19], '%Y-%m-%dT%H:%M:%S'))
-            print(f'lotus_miner_worker_job {{ miner_id="{miner_id}", job_id="{job_id}", worker_host="{ worker_host }", task="{task}", sector_id="{sector}", job_start_time="{job_start_time}", run_wait="{run_wait}" }} { START_TIME - job_start_epoch }')
+            job_start_epoch = time.mktime(time.strptime("".join([job_start_time[:19],job_start_time[29:]]), '%Y-%m-%dT%H:%M:%S%z'))
+            print(f'lotus_miner_worker_job {{ miner_id="{miner_id}", job_id="{job_id}", worker_host="{ worker_host }", task="{task}", worker = "{wrk}", sector_id="{sector}", job_start_time="{job_start_time}", run_wait="{run_wait}" }} { START_TIME - job_start_epoch }')
     checkpoint("Jobs")
 
     # GENERATE JOB SCHEDDIAG

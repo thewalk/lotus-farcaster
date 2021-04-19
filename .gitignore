@@ -9,3 +9,8 @@ lotus-exporter-farcaster/__pycache__/
 
 # exported containers
 /*.tar
+
+
+.vscode/
+
+log/
